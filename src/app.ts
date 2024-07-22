@@ -2,13 +2,15 @@
  * 클래스 & 인터페이스
  * private = 접근 제한자 / public = 외부에서 액세스 가능
  * readonly = 읽기 전용 초기화된 후 수정할 수 없음.
+ * protected = private와 유사 , 외부 액세스를 제한 , 상속 받은 클래스에서도 액세스 가능
  */
 class Department {
     // name: string; // public name: string; 과 동일
     // private id : string;
     // private name : string;
-    private employees: string[] = []; //besides properties, you can also mark methods as "private" (속성 외에도 메소드를 "비공개"로 표시할 수도 있습니다.)
+    // private employees: string[] = []; //besides properties, you can also mark methods as "private" (속성 외에도 메소드를 "비공개"로 표시할 수도 있습니다.)
     //private를 붙이면 클래스 또는 생성된 객체 안에서만 이 프로퍼티를 액세스할 수 있음.
+    protected employees: string[] = [];
 
     constructor (private readonly id: string, public name: string) {// 초기화 코드 없이 한번에 정의 하고 값을 할당,
         //생성자에서 받을 인수를 명시하고 접근 제한자가 달린 인수는 동일한 이름의 프로퍼티를 생성, 인수에서 받은 값을 프로퍼티에 저장 // 코드가 간결해짐
@@ -36,20 +38,63 @@ class Department {
     }
 }
 
-const accounting = new Department('d1', 'Accounting');
+/**
+ * 상속
+ */
+class ITDepartment extends Department {
+    admins: string[];
+    constructor (id: string,  admins: string[]) {
+        super(id, 'IT'); //super은 부모 클래스 생성자의 인수 id,name을 받는다 
+        this.admins = admins;
+    }
+}
+
+//기본 클래스의 메서드를 오버라이드 해서 기본 클래스에 구현된 메서드 대신 상속받은 클래스에서 구현한 매서드를
+//protected를 사용하면 상속받은 클래스에서도 프로퍼티를 사용할 수 있다.
+class AccountingDepartment extends Department {
+    constructor (id: string, private reports: string[]) {
+        super(id, 'Accounting'); 
+    }
+
+    addEmployee(name: string) {
+        if (name === 'Max') {
+            return;
+        }
+        this.employees.push(name);
+        
+    }
+
+    addReport(text: string) {
+        this.reports.push(text);
+    }
+
+    printReports() {
+        console.log(this.reports);
+    }
+}
+
+const it = new ITDepartment('d1', ['Max']);
+const accounting = new AccountingDepartment('d2', []);
+
+accounting.addReport('Something went wrong...');
+accounting.addEmployee('Max');
+accounting.addEmployee('Manu');
+
+accounting.printEmployeeInformation();
+accounting.printReports();
 
 // console.log(accounting);
 
-accounting.addEmployee('MAX');
-accounting.addEmployee('manu');
+it.addEmployee('MAX');
+it.addEmployee('manu');
 
 // accounting.employees[2] = 'Anna'; //가능은 하지만 복잡한 것을 만들 떄 좋지 않음., 한가지 방법으로 제한하는 것이 좋음
 //검증하는 과정이 생략됨. 
 //private를 붙이면 해당 코드 오류 발생, department 클래스 안에서만 액세스 가능함
 //컴파일 할때는 에러가 발생하지만 자바스크립트에서는 오류 발생x
 
-accounting.describe();
-accounting.printEmployeeInformation();
+it.describe();
+it.printEmployeeInformation();
 
 // const accountingCopy = { name: 's', describe : accounting.describe}
 //name 프로퍼티 추가하면 아래 호출오류 안남
