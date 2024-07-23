@@ -52,8 +52,30 @@ class ITDepartment extends Department {
 //기본 클래스의 메서드를 오버라이드 해서 기본 클래스에 구현된 메서드 대신 상속받은 클래스에서 구현한 매서드를
 //protected를 사용하면 상속받은 클래스에서도 프로퍼티를 사용할 수 있다.
 class AccountingDepartment extends Department {
+    private lastReport: string;
+
+    //getters/setters
+    //비공개로 설정할 필요가 있는 속성을 private로 설정한 후, 
+    //이 속성에 접근하여 값을 읽거나, 쓰기 위한 Getter, Setter 함수를 사용하여 속성을 정의할 수 있습니다.
+    //게터 get
+    get mostRecentReport() {
+        if (this.lastReport){
+            return this.lastReport;
+        }
+        throw new Error('No report found.')
+    }
+
+    //세터 set
+    set mostRecentReport(value: string) {
+        if (!value){
+            throw new Error ('Please pass in a valid value!')
+        }
+        this.addReport(value);
+    }
+
     constructor (id: string, private reports: string[]) {
         super(id, 'Accounting'); 
+        this.lastReport = reports[0];
     }
 
     addEmployee(name: string) {
@@ -66,6 +88,7 @@ class AccountingDepartment extends Department {
 
     addReport(text: string) {
         this.reports.push(text);
+        this.lastReport = text;
     }
 
     printReports() {
@@ -76,7 +99,9 @@ class AccountingDepartment extends Department {
 const it = new ITDepartment('d1', ['Max']);
 const accounting = new AccountingDepartment('d2', []);
 
+accounting.mostRecentReport = 'Year End Report';
 accounting.addReport('Something went wrong...');
+console.log(accounting.mostRecentReport);
 accounting.addEmployee('Max');
 accounting.addEmployee('Manu');
 
